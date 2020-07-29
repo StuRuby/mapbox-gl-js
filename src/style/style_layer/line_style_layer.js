@@ -4,21 +4,47 @@ import Point from '@mapbox/point-geometry';
 
 import StyleLayer from '../style_layer';
 import LineBucket from '../../data/bucket/line_bucket';
-import {polygonIntersectsBufferedMultiLine} from '../../util/intersection_tests';
-import {getMaximumPaintValue, translateDistance, translate} from '../query_utils';
+import {
+    polygonIntersectsBufferedMultiLine
+} from '../../util/intersection_tests';
+import {
+    getMaximumPaintValue,
+    translateDistance,
+    translate
+} from '../query_utils';
 import properties from './line_style_layer_properties';
-import {extend, MAX_SAFE_INTEGER} from '../../util/util';
+import {
+    extend,
+    MAX_SAFE_INTEGER
+} from '../../util/util';
 import EvaluationParameters from '../evaluation_parameters';
-import {Transitionable, Transitioning, Layout, PossiblyEvaluated, DataDrivenProperty} from '../properties';
+import {
+    Transitionable,
+    Transitioning,
+    Layout,
+    PossiblyEvaluated,
+    DataDrivenProperty
+} from '../properties';
 
 import Step from '../../style-spec/expression/definitions/step';
-import type {FeatureState, ZoomConstantExpression} from '../../style-spec/expression';
-import type {Bucket, BucketParameters} from '../../data/bucket';
-import type {LayoutProps, PaintProps} from './line_style_layer_properties';
+import type {
+    FeatureState,
+    ZoomConstantExpression
+} from '../../style-spec/expression';
+import type {
+    Bucket,
+    BucketParameters
+} from '../../data/bucket';
+import type {
+    LayoutProps,
+    PaintProps
+} from './line_style_layer_properties';
 import type Transform from '../../geo/transform';
-import type {LayerSpecification} from '../../style-spec/types';
+import type {
+    LayerSpecification
+} from '../../style-spec/types';
 
-class LineFloorwidthProperty extends DataDrivenProperty<number> {
+class LineFloorwidthProperty extends DataDrivenProperty < number > {
     useIntegerZoom: true;
 
     possiblyEvaluate(value, parameters) {
@@ -32,7 +58,9 @@ class LineFloorwidthProperty extends DataDrivenProperty<number> {
     }
 
     evaluate(value, globals, feature, featureState) {
-        globals = extend({}, globals, {zoom: Math.floor(globals.zoom)});
+        globals = extend({}, globals, {
+            zoom: Math.floor(globals.zoom)
+        });
         return super.evaluate(value, globals, feature, featureState);
     }
 }
@@ -41,15 +69,15 @@ const lineFloorwidthProperty = new LineFloorwidthProperty(properties.paint.prope
 lineFloorwidthProperty.useIntegerZoom = true;
 
 class LineStyleLayer extends StyleLayer {
-    _unevaluatedLayout: Layout<LayoutProps>;
-    layout: PossiblyEvaluated<LayoutProps>;
+    _unevaluatedLayout: Layout < LayoutProps > ;
+    layout: PossiblyEvaluated < LayoutProps > ;
 
     gradientVersion: number;
     stepInterpolant: boolean;
 
-    _transitionablePaint: Transitionable<PaintProps>;
-    _transitioningPaint: Transitioning<PaintProps>;
-    paint: PossiblyEvaluated<PaintProps>;
+    _transitionablePaint: Transitionable < PaintProps > ;
+    _transitioningPaint: Transitioning < PaintProps > ;
+    paint: PossiblyEvaluated < PaintProps > ;
 
     constructor(layer: LayerSpecification) {
         super(layer, properties);
@@ -58,7 +86,7 @@ class LineStyleLayer extends StyleLayer {
 
     _handleSpecialPaintPropertyUpdate(name: string) {
         if (name === 'line-gradient') {
-            const expression: ZoomConstantExpression<'source'> = ((this._transitionablePaint._values['line-gradient'].value.expression): any);
+            const expression: ZoomConstantExpression < 'source' > = ((this._transitionablePaint._values['line-gradient'].value.expression): any);
             this.stepInterpolant = expression._styleExpression.expression instanceof Step;
             this.gradientVersion = (this.gradientVersion + 1) % MAX_SAFE_INTEGER;
         }
@@ -68,14 +96,14 @@ class LineStyleLayer extends StyleLayer {
         return this._transitionablePaint._values['line-gradient'].value.expression;
     }
 
-    recalculate(parameters: EvaluationParameters, availableImages: Array<string>) {
+    recalculate(parameters: EvaluationParameters, availableImages: Array < string > ) {
         super.recalculate(parameters, availableImages);
 
         (this.paint._values: any)['line-floorwidth'] =
-            lineFloorwidthProperty.possiblyEvaluate(this._transitioningPaint._values['line-width'].value, parameters);
+        lineFloorwidthProperty.possiblyEvaluate(this._transitioningPaint._values['line-width'].value, parameters);
     }
 
-    createBucket(parameters: BucketParameters<*>) {
+    createBucket(parameters: BucketParameters < * > ) {
         return new LineBucket(parameters);
     }
 
@@ -88,13 +116,13 @@ class LineStyleLayer extends StyleLayer {
         return width / 2 + Math.abs(offset) + translateDistance(this.paint.get('line-translate'));
     }
 
-    queryIntersectsFeature(queryGeometry: Array<Point>,
-                           feature: VectorTileFeature,
-                           featureState: FeatureState,
-                           geometry: Array<Array<Point>>,
-                           zoom: number,
-                           transform: Transform,
-                           pixelsToTileUnits: number): boolean {
+    queryIntersectsFeature(queryGeometry: Array < Point > ,
+        feature: VectorTileFeature,
+        featureState: FeatureState,
+        geometry: Array < Array < Point >> ,
+        zoom: number,
+        transform: Transform,
+        pixelsToTileUnits: number): boolean {
         const translatedPolygon = translate(queryGeometry,
             this.paint.get('line-translate'),
             this.paint.get('line-translate-anchor'),

@@ -1,4 +1,3 @@
-
 import refProperties from './util/ref_properties';
 
 function deref(layer, parent) {

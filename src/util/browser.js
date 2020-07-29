@@ -1,7 +1,9 @@
 // @flow strict
 
 import window from './window';
-import type {Cancelable} from '../types/cancelable';
+import type {
+    Cancelable
+} from '../types/cancelable';
 
 const now = window.performance && window.performance.now ?
     window.performance.now.bind(window.performance) :
@@ -33,10 +35,12 @@ const exported = {
 
     frame(fn: (paintStartTimestamp: number) => void): Cancelable {
         const frame = raf(fn);
-        return {cancel: () => cancel(frame)};
+        return {
+            cancel: () => cancel(frame)
+        };
     },
 
-    getImageData(img: CanvasImageSource, padding?: number = 0): ImageData {
+    getImageData(img: CanvasImageSource, padding ? : number = 0): ImageData {
         const canvas = window.document.createElement('canvas');
         const context = canvas.getContext('2d');
         if (!context) {
@@ -53,10 +57,12 @@ const exported = {
         linkEl.href = path;
         return linkEl.href;
     },
-
+    // 计算当前浏览器所拥有的CPU核心数
     hardwareConcurrency: window.navigator && window.navigator.hardwareConcurrency || 4,
 
-    get devicePixelRatio() { return window.devicePixelRatio; },
+    get devicePixelRatio() {
+        return window.devicePixelRatio;
+    },
     get prefersReducedMotion(): boolean {
         if (!window.matchMedia) return false;
         //Lazily initialize media query

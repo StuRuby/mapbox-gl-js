@@ -1,6 +1,9 @@
 // @flow
 
-import {endsWith, filterObject} from '../util/util';
+import {
+    endsWith,
+    filterObject
+} from '../util/util';
 
 import styleSpec from '../style-spec/reference/latest';
 import {
@@ -9,24 +12,50 @@ import {
     validatePaintProperty,
     emitValidationErrors
 } from './validate_style';
-import {Evented} from '../util/evented';
-import {Layout, Transitionable, Transitioning, Properties, PossiblyEvaluated, PossiblyEvaluatedPropertyValue} from './properties';
-import {supportsPropertyExpression} from '../style-spec/util/properties';
+import {
+    Evented
+} from '../util/evented';
+import {
+    Layout,
+    Transitionable,
+    Transitioning,
+    Properties,
+    PossiblyEvaluated,
+    PossiblyEvaluatedPropertyValue
+} from './properties';
+import {
+    supportsPropertyExpression
+} from '../style-spec/util/properties';
 
-import type {FeatureState} from '../style-spec/expression';
-import type {Bucket} from '../data/bucket';
+import type {
+    FeatureState
+} from '../style-spec/expression';
+import type {
+    Bucket
+} from '../data/bucket';
 import type Point from '@mapbox/point-geometry';
-import type {FeatureFilter} from '../style-spec/feature_filter';
-import type {TransitionParameters, PropertyValue} from './properties';
-import type EvaluationParameters, {CrossfadeParameters} from './evaluation_parameters';
+import type {
+    FeatureFilter
+} from '../style-spec/feature_filter';
+import type {
+    TransitionParameters,
+    PropertyValue
+} from './properties';
+import type EvaluationParameters, {
+    CrossfadeParameters
+} from './evaluation_parameters';
 import type Transform from '../geo/transform';
 import type {
     LayerSpecification,
     FilterSpecification
 } from '../style-spec/types';
-import type {CustomLayerInterface} from './style_layer/custom_style_layer';
+import type {
+    CustomLayerInterface
+} from './style_layer/custom_style_layer';
 import type Map from '../ui/map';
-import type {StyleSetterOptions} from './style';
+import type {
+    StyleSetterOptions
+} from './style';
 
 const TRANSITION_SUFFIX = '-transition';
 
@@ -35,41 +64,49 @@ class StyleLayer extends Evented {
     metadata: mixed;
     type: string;
     source: string;
-    sourceLayer: ?string;
-    minzoom: ?number;
-    maxzoom: ?number;
+    sourceLayer: ? string;
+    minzoom: ? number;
+    maxzoom: ? number;
     filter: FilterSpecification | void;
     visibility: 'visible' | 'none' | void;
     _crossfadeParameters: CrossfadeParameters;
 
-    _unevaluatedLayout: Layout<any>;
-    +layout: mixed;
+    _unevaluatedLayout: Layout < any > ; +
+    layout: mixed;
 
-    _transitionablePaint: Transitionable<any>;
-    _transitioningPaint: Transitioning<any>;
-    +paint: mixed;
+    _transitionablePaint: Transitionable < any > ;
+    _transitioningPaint: Transitioning < any > ; +
+    paint: mixed;
 
     _featureFilter: FeatureFilter;
 
-    +queryRadius: (bucket: Bucket) => number;
-    +queryIntersectsFeature: (queryGeometry: Array<Point>,
-                              feature: VectorTileFeature,
-                              featureState: FeatureState,
-                              geometry: Array<Array<Point>>,
-                              zoom: number,
-                              transform: Transform,
-                              pixelsToTileUnits: number,
-                              pixelPosMatrix: Float32Array) => boolean | number;
+    +
+    queryRadius: (bucket: Bucket) => number; +
+    queryIntersectsFeature: (queryGeometry: Array < Point > ,
+        feature: VectorTileFeature,
+        featureState: FeatureState,
+        geometry: Array < Array < Point >> ,
+        zoom: number,
+        transform: Transform,
+        pixelsToTileUnits: number,
+        pixelPosMatrix: Float32Array) => boolean | number;
 
-    +onAdd: ?(map: Map) => void;
-    +onRemove: ?(map: Map) => void;
+    +
+    onAdd: ? (map: Map) => void; +
+    onRemove: ? (map: Map) => void;
 
-    constructor(layer: LayerSpecification | CustomLayerInterface, properties: $ReadOnly<{layout?: Properties<*>, paint?: Properties<*>}>) {
+    constructor(layer: LayerSpecification | CustomLayerInterface, properties: $ReadOnly < {
+        layout ? : Properties < * > ,
+        paint ? : Properties < * >
+    } > ) {
         super();
 
         this.id = layer.id;
         this.type = layer.type;
-        this._featureFilter = {filter: () => true, needGeometry: false};
+        this._featureFilter = {
+            filter: () => true,
+            needGeometry: false
+        };
 
         if (layer.type === 'custom') return;
 
@@ -93,10 +130,14 @@ class StyleLayer extends Evented {
             this._transitionablePaint = new Transitionable(properties.paint);
 
             for (const property in layer.paint) {
-                this.setPaintProperty(property, layer.paint[property], {validate: false});
+                this.setPaintProperty(property, layer.paint[property], {
+                    validate: false
+                });
             }
             for (const property in layer.layout) {
-                this.setLayoutProperty(property, layer.layout[property], {validate: false});
+                this.setLayoutProperty(property, layer.layout[property], {
+                    validate: false
+                });
             }
 
             this._transitioningPaint = this._transitionablePaint.untransitioned();
@@ -176,7 +217,8 @@ class StyleLayer extends Evented {
     }
 
     // eslint-disable-next-line no-unused-vars
-    _handleOverridablePaintPropertyUpdate<T, R>(name: string, oldValue: PropertyValue<T, R>, newValue: PropertyValue<T, R>): boolean {
+    _handleOverridablePaintPropertyUpdate < T,
+    R > (name: string, oldValue: PropertyValue < T, R > , newValue: PropertyValue < T, R > ): boolean {
         // No-op; can be overridden by derived classes.
         return false;
     }
@@ -195,7 +237,7 @@ class StyleLayer extends Evented {
         return this._transitioningPaint.hasTransition();
     }
 
-    recalculate(parameters: EvaluationParameters, availableImages: Array<string>) {
+    recalculate(parameters: EvaluationParameters, availableImages: Array < string > ) {
         if (parameters.getCrossfadeParameters) {
             this._crossfadeParameters = parameters.getCrossfadeParameters();
         }
@@ -244,7 +286,10 @@ class StyleLayer extends Evented {
             value,
             styleSpec,
             // Workaround for https://github.com/mapbox/mapbox-gl-js/issues/2407
-            style: {glyphs: true, sprite: true}
+            style: {
+                glyphs: true,
+                sprite: true
+            }
         }));
     }
 

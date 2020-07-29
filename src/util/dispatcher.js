@@ -1,6 +1,9 @@
 // @flow
 
-import {uniqueId, asyncAll} from './util';
+import {
+    uniqueId,
+    asyncAll
+} from './util';
 import Actor from './actor';
 import assert from 'assert';
 
@@ -14,12 +17,12 @@ import type WorkerPool from './worker_pool';
  */
 class Dispatcher {
     workerPool: WorkerPool;
-    actors: Array<Actor>;
+    actors: Array < Actor > ;
     currentActor: number;
     id: number;
 
     // exposed to allow stubbing in unit tests
-    static Actor: Class<Actor>;
+    static Actor: Class < Actor > ;
 
     constructor(workerPool: WorkerPool, parent: any) {
         this.workerPool = workerPool;
@@ -40,7 +43,7 @@ class Dispatcher {
      * Broadcast a message to all Workers.
      * @private
      */
-    broadcast(type: string, data: mixed, cb?: Function) {
+    broadcast(type: string, data: mixed, cb ? : Function) {
         assert(this.actors.length);
         cb = cb || function () {};
         asyncAll(this.actors, (actor, done) => {
@@ -59,7 +62,9 @@ class Dispatcher {
     }
 
     remove() {
-        this.actors.forEach((actor) => { actor.remove(); });
+        this.actors.forEach((actor) => {
+            actor.remove();
+        });
         this.actors = [];
         this.workerPool.release(this.id);
     }

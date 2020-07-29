@@ -1,12 +1,16 @@
 // @flow
 
-import {getTileBBox} from '@mapbox/whoots-js';
+import {
+    getTileBBox
+} from '@mapbox/whoots-js';
 import EXTENT from '../data/extent';
 import Point from '@mapbox/point-geometry';
 import MercatorCoordinate from '../geo/mercator_coordinate';
 
 import assert from 'assert';
-import {register} from '../util/web_worker_transfer';
+import {
+    register
+} from '../util/web_worker_transfer';
 
 export class CanonicalTileID {
     z: number;
@@ -29,7 +33,7 @@ export class CanonicalTileID {
     }
 
     // given a list of urls, choose a url template and return a tile URL
-    url(urls: Array<string>, scheme: ?string) {
+    url(urls: Array < string > , scheme: ? string) {
         const bbox = getTileBBox(this.x, this.y, this.z);
         const quadkey = getQuadkey(this.z, this.x, this.y);
 
@@ -119,8 +123,8 @@ export class OverscaledTileID {
         // We're first testing for z == 0, to avoid a 32 bit shift, which is undefined.
         return parent.overscaledZ === 0 || (
             parent.overscaledZ < this.overscaledZ &&
-                parent.canonical.x === (this.canonical.x >> zDifference) &&
-                parent.canonical.y === (this.canonical.y >> zDifference));
+            parent.canonical.x === (this.canonical.x >> zDifference) &&
+            parent.canonical.y === (this.canonical.y >> zDifference));
     }
 
     children(sourceMaxZoom: number) {
@@ -187,7 +191,8 @@ function calculateKey(wrap: number, overscaledZ: number, z: number, x: number, y
 }
 
 function getQuadkey(z, x, y) {
-    let quadkey = '', mask;
+    let quadkey = '',
+        mask;
     for (let i = z; i > 0; i--) {
         mask = 1 << (i - 1);
         quadkey += ((x & mask ? 1 : 0) + (y & mask ? 2 : 0));
@@ -196,4 +201,6 @@ function getQuadkey(z, x, y) {
 }
 
 register('CanonicalTileID', CanonicalTileID);
-register('OverscaledTileID', OverscaledTileID, {omit: ['posMatrix']});
+register('OverscaledTileID', OverscaledTileID, {
+    omit: ['posMatrix']
+});

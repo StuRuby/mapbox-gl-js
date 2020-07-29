@@ -1,49 +1,73 @@
 // @flow
 
 /***** START WARNING - IF YOU USE THIS CODE WITH MAPBOX MAPPING APIS, REMOVAL OR
-* MODIFICATION OF THE FOLLOWING CODE VIOLATES THE MAPBOX TERMS OF SERVICE  ******
-* The following code is used to access Mapbox's Mapping APIs. Removal or modification
-* of this code when used with Mapbox's Mapping APIs can result in higher fees and/or
-* termination of your account with Mapbox.
-*
-* Under the Mapbox Terms of Service, you may not use this code to access Mapbox
-* Mapping APIs other than through Mapbox SDKs.
-*
-* The Mapping APIs documentation is available at https://docs.mapbox.com/api/maps/#maps
-* and the Mapbox Terms of Service are available at https://www.mapbox.com/tos/
-******************************************************************************/
+ * MODIFICATION OF THE FOLLOWING CODE VIOLATES THE MAPBOX TERMS OF SERVICE  ******
+ * The following code is used to access Mapbox's Mapping APIs. Removal or modification
+ * of this code when used with Mapbox's Mapping APIs can result in higher fees and/or
+ * termination of your account with Mapbox.
+ *
+ * Under the Mapbox Terms of Service, you may not use this code to access Mapbox
+ * Mapping APIs other than through Mapbox SDKs.
+ *
+ * The Mapping APIs documentation is available at https://docs.mapbox.com/api/maps/#maps
+ * and the Mapbox Terms of Service are available at https://www.mapbox.com/tos/
+ ******************************************************************************/
 
 import config from './config';
 
 import browser from './browser';
 import window from './window';
 import webpSupported from './webp_supported';
-import {createSkuToken, SKU_ID} from './sku_token';
-import {version as sdkVersion} from '../../package.json';
-import {uuid, validateUuid, storageAvailable, b64DecodeUnicode, b64EncodeUnicode, warnOnce, extend} from './util';
-import {postData, ResourceType} from './ajax';
+import {
+    createSkuToken,
+    SKU_ID
+} from './sku_token';
+import {
+    version as sdkVersion
+} from '../../package.json';
+import {
+    uuid,
+    validateUuid,
+    storageAvailable,
+    b64DecodeUnicode,
+    b64EncodeUnicode,
+    warnOnce,
+    extend
+} from './util';
+import {
+    postData,
+    ResourceType
+} from './ajax';
 
-import type {RequestParameters} from './ajax';
-import type {Cancelable} from '../types/cancelable';
-import type {TileJSON} from '../types/tilejson';
+import type {
+    RequestParameters
+} from './ajax';
+import type {
+    Cancelable
+} from '../types/cancelable';
+import type {
+    TileJSON
+} from '../types/tilejson';
 
-type ResourceTypeEnum = $Keys<typeof ResourceType>;
-export type RequestTransformFunction = (url: string, resourceType?: ResourceTypeEnum) => RequestParameters;
+type ResourceTypeEnum = $Keys < typeof ResourceType > ;
+export type RequestTransformFunction = (url: string, resourceType ? : ResourceTypeEnum) => RequestParameters;
 
-type UrlObject = {|
+type UrlObject = {
+    |
     protocol: string,
     authority: string,
     path: string,
-    params: Array<string>
-|};
+    params: Array < string >
+        |
+};
 
 export class RequestManager {
     _skuToken: string;
     _skuTokenExpiresAt: number;
-    _transformRequestFn: ?RequestTransformFunction;
-    _customAccessToken: ?string;
+    _transformRequestFn: ? RequestTransformFunction;
+    _customAccessToken: ? string;
 
-    constructor(transformRequestFn?: RequestTransformFunction, customAccessToken?: string) {
+    constructor(transformRequestFn ? : RequestTransformFunction, customAccessToken ? : string) {
         this._transformRequestFn = transformRequestFn;
         this._customAccessToken = customAccessToken;
         this._createSkuToken();
@@ -61,27 +85,31 @@ export class RequestManager {
 
     transformRequest(url: string, type: ResourceTypeEnum) {
         if (this._transformRequestFn) {
-            return this._transformRequestFn(url, type) || {url};
+            return this._transformRequestFn(url, type) || {
+                url
+            };
         }
 
-        return {url};
+        return {
+            url
+        };
     }
 
-    normalizeStyleURL(url: string, accessToken?: string): string {
+    normalizeStyleURL(url: string, accessToken ? : string): string {
         if (!isMapboxURL(url)) return url;
         const urlObject = parseUrl(url);
         urlObject.path = `/styles/v1${urlObject.path}`;
         return this._makeAPIURL(urlObject, this._customAccessToken || accessToken);
     }
 
-    normalizeGlyphsURL(url: string, accessToken?: string): string {
+    normalizeGlyphsURL(url: string, accessToken ? : string): string {
         if (!isMapboxURL(url)) return url;
         const urlObject = parseUrl(url);
         urlObject.path = `/fonts/v1${urlObject.path}`;
         return this._makeAPIURL(urlObject, this._customAccessToken || accessToken);
     }
 
-    normalizeSourceURL(url: string, accessToken?: string): string {
+    normalizeSourceURL(url: string, accessToken ? : string): string {
         if (!isMapboxURL(url)) return url;
         const urlObject = parseUrl(url);
         urlObject.path = `/v4/${urlObject.authority}.json`;
@@ -91,7 +119,7 @@ export class RequestManager {
         return this._makeAPIURL(urlObject, this._customAccessToken || accessToken);
     }
 
-    normalizeSpriteURL(url: string, format: string, extension: string, accessToken?: string): string {
+    normalizeSpriteURL(url: string, format: string, extension: string, accessToken ? : string): string {
         const urlObject = parseUrl(url);
         if (!isMapboxURL(url)) {
             urlObject.path += `${format}${extension}`;
@@ -101,7 +129,7 @@ export class RequestManager {
         return this._makeAPIURL(urlObject, this._customAccessToken || accessToken);
     }
 
-    normalizeTileURL(tileURL: string, tileSize?: ?number): string {
+    normalizeTileURL(tileURL: string, tileSize ? : ? number): string {
         if (this._isSkuTokenExpired()) {
             this._createSkuToken();
         }
@@ -143,7 +171,7 @@ export class RequestManager {
         }
         // Reassemble the canonical URL from the parts we've parsed before.
         let result = "mapbox://tiles/";
-        result +=  urlObject.path.replace(version, '');
+        result += urlObject.path.replace(version, '');
 
         // Append the query string, minus the access token parameter.
         let params = urlObject.params;
@@ -154,7 +182,7 @@ export class RequestManager {
         return result;
     }
 
-    canonicalizeTileset(tileJSON: TileJSON, sourceURL?: string) {
+    canonicalizeTileset(tileJSON: TileJSON, sourceURL ? : string) {
         const removeAccessToken = sourceURL ? isMapboxURL(sourceURL) : false;
         const canonical = [];
         for (const url of tileJSON.tiles || []) {
@@ -196,6 +224,7 @@ function isMapboxURL(url: string) {
 }
 
 const mapboxHTTPURLRe = /^((https?:)?\/\/)?([^\/]+\.)?mapbox\.c(n|om)(\/|\?|$)/i;
+
 function isMapboxHTTPURL(url: string): boolean {
     return mapboxHTTPURLRe.test(url);
 }
@@ -204,7 +233,7 @@ function hasCacheDefeatingSku(url: string) {
     return url.indexOf('sku=') > 0 && isMapboxHTTPURL(url);
 }
 
-function getAccessToken(params: Array<string>): string | null {
+function getAccessToken(params: Array < string > ): string | null {
     for (const param of params) {
         const match = param.match(/^access_token=(.*)$/);
         if (match) {
@@ -234,11 +263,15 @@ function formatUrl(obj: UrlObject): string {
     return `${obj.protocol}://${obj.authority}${obj.path}${params}`;
 }
 
-export {isMapboxURL, isMapboxHTTPURL, hasCacheDefeatingSku};
+export {
+    isMapboxURL,
+    isMapboxHTTPURL,
+    hasCacheDefeatingSku
+};
 
 const telemEventKey = 'mapbox.eventData';
 
-function parseAccessToken(accessToken: ?string) {
+function parseAccessToken(accessToken: ? string) {
     if (!accessToken) {
         return null;
     }
@@ -260,11 +293,11 @@ type TelemetryEventType = 'appUserTurnstile' | 'map.load';
 
 class TelemetryEvent {
     eventData: any;
-    anonId: ?string;
-    queue: Array<any>;
+    anonId: ? string;
+    queue: Array < any > ;
     type: TelemetryEventType;
-    pendingRequest: ?Cancelable;
-    _customAccessToken: ?string;
+    pendingRequest: ? Cancelable;
+    _customAccessToken: ? string;
 
     constructor(type: TelemetryEventType) {
         this.type = type;
@@ -274,7 +307,7 @@ class TelemetryEvent {
         this.pendingRequest = null;
     }
 
-    getStorageKey(domain: ?string) {
+    getStorageKey(domain: ? string) {
         const tokenData = parseAccessToken(config.ACCESS_TOKEN);
         let u = '';
         if (tokenData && tokenData['u']) {
@@ -310,7 +343,7 @@ class TelemetryEvent {
 
     saveEventData() {
         const isLocalStorageAvailable = storageAvailable('localStorage');
-        const storageKey =  this.getStorageKey();
+        const storageKey = this.getStorageKey();
         const uuidKey = this.getStorageKey('uuid');
         if (isLocalStorageAvailable) {
             try {
@@ -325,14 +358,16 @@ class TelemetryEvent {
 
     }
 
-    processRequests(_: ?string) {}
+    processRequests(_: ? string) {}
 
     /*
-    * If any event data should be persisted after the POST request, the callback should modify eventData`
-    * to the values that should be saved. For this reason, the callback should be invoked prior to the call
-    * to TelemetryEvent#saveData
-    */
-    postEvent(timestamp: number, additionalPayload: {[_: string]: any}, callback: (err: ?Error) => void, customAccessToken?: ?string) {
+     * If any event data should be persisted after the POST request, the callback should modify eventData`
+     * to the values that should be saved. For this reason, the callback should be invoked prior to the call
+     * to TelemetryEvent#saveData
+     */
+    postEvent(timestamp: number, additionalPayload: {
+        [_: string]: any
+    }, callback: (err: ? Error) => void, customAccessToken ? : ? string) {
         if (!config.EVENTS_URL) return;
         const eventsUrlObject: UrlObject = parseUrl(config.EVENTS_URL);
         eventsUrlObject.params.push(`access_token=${customAccessToken || config.ACCESS_TOKEN || ''}`);
@@ -363,14 +398,19 @@ class TelemetryEvent {
         });
     }
 
-    queueRequest(event: number | {id: number, timestamp: number}, customAccessToken?: ?string) {
+    queueRequest(event: number | {
+        id: number,
+        timestamp: number
+    }, customAccessToken ? : ? string) {
         this.queue.push(event);
         this.processRequests(customAccessToken);
     }
 }
 
 export class MapLoadEvent extends TelemetryEvent {
-    +success: {[_: number]: boolean};
+    +success: {
+        [_: number]: boolean
+    };
     skuToken: string;
 
     constructor() {
@@ -379,7 +419,7 @@ export class MapLoadEvent extends TelemetryEvent {
         this.skuToken = '';
     }
 
-    postMapLoadEvent(tileUrls: Array<string>, mapId: number, skuToken: string, customAccessToken: string) {
+    postMapLoadEvent(tileUrls: Array < string > , mapId: number, skuToken: string, customAccessToken: string) {
         //Enabled only when Mapbox Access Token is set and a source uses
         // mapbox tiles.
         this.skuToken = skuToken;
@@ -388,13 +428,19 @@ export class MapLoadEvent extends TelemetryEvent {
             customAccessToken || config.ACCESS_TOKEN &&
             Array.isArray(tileUrls) &&
             tileUrls.some(url => isMapboxURL(url) || isMapboxHTTPURL(url))) {
-            this.queueRequest({id: mapId, timestamp: Date.now()}, customAccessToken);
+            this.queueRequest({
+                id: mapId,
+                timestamp: Date.now()
+            }, customAccessToken);
         }
     }
 
-    processRequests(customAccessToken?: ?string) {
+    processRequests(customAccessToken ? : ? string) {
         if (this.pendingRequest || this.queue.length === 0) return;
-        const {id, timestamp} = this.queue.shift();
+        const {
+            id,
+            timestamp
+        } = this.queue.shift();
 
         // Only one load event should fire per map
         if (id && this.success[id]) return;
@@ -407,7 +453,9 @@ export class MapLoadEvent extends TelemetryEvent {
             this.anonId = uuid();
         }
 
-        this.postEvent(timestamp, {skuToken: this.skuToken}, (err) => {
+        this.postEvent(timestamp, {
+            skuToken: this.skuToken
+        }, (err) => {
             if (!err) {
                 if (id) this.success[id] = true;
             }
@@ -416,12 +464,12 @@ export class MapLoadEvent extends TelemetryEvent {
 }
 
 export class TurnstileEvent extends TelemetryEvent {
-    constructor(customAccessToken?: ?string) {
+    constructor(customAccessToken ? : ? string) {
         super('appUserTurnstile');
         this._customAccessToken = customAccessToken;
     }
 
-    postTurnstileEvent(tileUrls: Array<string>, customAccessToken?: ?string) {
+    postTurnstileEvent(tileUrls: Array < string > , customAccessToken ? : ? string) {
         //Enabled only when Mapbox Access Token is set and a source uses
         // mapbox tiles.
         if (config.EVENTS_URL &&
@@ -432,7 +480,7 @@ export class TurnstileEvent extends TelemetryEvent {
         }
     }
 
-    processRequests(customAccessToken?: ?string) {
+    processRequests(customAccessToken ? : ? string) {
         if (this.pendingRequest || this.queue.length === 0) {
             return;
         }
@@ -467,7 +515,9 @@ export class TurnstileEvent extends TelemetryEvent {
             return this.processRequests();
         }
 
-        this.postEvent(nextUpdate, {"enabled.telemetry": false}, (err) => {
+        this.postEvent(nextUpdate, {
+            "enabled.telemetry": false
+        }, (err) => {
             if (!err) {
                 this.eventData.lastSuccess = nextUpdate;
                 this.eventData.tokenU = tokenU;

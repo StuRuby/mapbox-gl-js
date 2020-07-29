@@ -1,12 +1,18 @@
 // @flow
 
-import {getArrayBuffer} from '../util/ajax';
+import {
+    getArrayBuffer
+} from '../util/ajax';
 
 import vt from '@mapbox/vector-tile';
 import Protobuf from 'pbf';
 import WorkerTile from './worker_tile';
-import {extend} from '../util/util';
-import {RequestPerformance} from '../util/performance';
+import {
+    extend
+} from '../util/util';
+import {
+    RequestPerformance
+} from '../util/performance';
 
 import type {
     WorkerSource,
@@ -17,14 +23,16 @@ import type {
 
 import type Actor from '../util/actor';
 import type StyleLayerIndex from '../style/style_layer_index';
-import type {Callback} from '../types/callback';
+import type {
+    Callback
+} from '../types/callback';
 
 export type LoadVectorTileResult = {
     vectorTile: VectorTile;
     rawData: ArrayBuffer;
-    expires?: any;
-    cacheControl?: any;
-    resourceTiming?: Array<PerformanceResourceTiming>;
+    expires ? : any;
+    cacheControl ? : any;
+    resourceTiming ? : Array < PerformanceResourceTiming > ;
 };
 
 /**
@@ -33,16 +41,16 @@ export type LoadVectorTileResult = {
  * @param vectorTile
  * @private
  */
-export type LoadVectorDataCallback = Callback<?LoadVectorTileResult>;
+export type LoadVectorDataCallback = Callback < ? LoadVectorTileResult > ;
 
 export type AbortVectorData = () => void;
-export type LoadVectorData = (params: WorkerTileParameters, callback: LoadVectorDataCallback) => ?AbortVectorData;
+export type LoadVectorData = (params: WorkerTileParameters, callback: LoadVectorDataCallback) => ? AbortVectorData;
 
 /**
  * @private
  */
 function loadVectorTile(params: WorkerTileParameters, callback: LoadVectorDataCallback) {
-    const request = getArrayBuffer(params.request, (err: ?Error, data: ?ArrayBuffer, cacheControl: ?string, expires: ?string) => {
+    const request = getArrayBuffer(params.request, (err: ? Error, data : ? ArrayBuffer, cacheControl : ? string, expires : ? string) => {
         if (err) {
             callback(err);
         } else if (data) {
@@ -72,10 +80,14 @@ function loadVectorTile(params: WorkerTileParameters, callback: LoadVectorDataCa
 class VectorTileWorkerSource implements WorkerSource {
     actor: Actor;
     layerIndex: StyleLayerIndex;
-    availableImages: Array<string>;
+    availableImages: Array < string > ;
     loadVectorData: LoadVectorData;
-    loading: {[_: string]: WorkerTile };
-    loaded: {[_: string]: WorkerTile };
+    loading: {
+        [_: string]: WorkerTile
+    };
+    loaded: {
+        [_: string]: WorkerTile
+    };
 
     /**
      * @param [loadVectorData] Optional method for custom loading of a VectorTile
@@ -84,7 +96,7 @@ class VectorTileWorkerSource implements WorkerSource {
      * loads the pbf at `params.url`.
      * @private
      */
-    constructor(actor: Actor, layerIndex: StyleLayerIndex, availableImages: Array<string>, loadVectorData: ?LoadVectorData) {
+    constructor(actor: Actor, layerIndex: StyleLayerIndex, availableImages: Array < string > , loadVectorData: ? LoadVectorData) {
         this.actor = actor;
         this.layerIndex = layerIndex;
         this.availableImages = availableImages;
@@ -137,7 +149,9 @@ class VectorTileWorkerSource implements WorkerSource {
                 if (err || !result) return callback(err);
 
                 // Transferring a copy of rawTileData because the worker needs to retain its copy.
-                callback(null, extend({rawTileData: rawTileData.slice(0)}, result, cacheControl, resourceTiming));
+                callback(null, extend({
+                    rawTileData: rawTileData.slice(0)
+                }, result, cacheControl, resourceTiming));
             });
 
             this.loaded = this.loaded || {};

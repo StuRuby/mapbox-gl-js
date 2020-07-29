@@ -1,7 +1,9 @@
 // @flow
 
 import WebWorker from './web_worker';
-import type {WorkerInterface} from './web_worker';
+import type {
+    WorkerInterface
+} from './web_worker';
 import browser from './browser';
 
 export const PRELOAD_POOL_ID = 'mapboxgl_preloaded_worker_pool';
@@ -13,14 +15,16 @@ export const PRELOAD_POOL_ID = 'mapboxgl_preloaded_worker_pool';
 export default class WorkerPool {
     static workerCount: number;
 
-    active: {[_: number | string]: boolean};
-    workers: Array<WorkerInterface>;
+    active: {
+        [_: number | string]: boolean
+    };
+    workers: Array < WorkerInterface > ;
 
     constructor() {
         this.active = {};
     }
 
-    acquire(mapId: number | string): Array<WorkerInterface> {
+    acquire(mapId: number | string): Array < WorkerInterface > {
         if (!this.workers) {
             // Lazily look up the value of mapboxgl.workerCount so that
             // client code has had a chance to set it.
@@ -52,6 +56,7 @@ export default class WorkerPool {
         return Object.keys(this.active).length;
     }
 }
-
+// 计算合理可用的处理器数量
 const availableLogicalProcessors = Math.floor(browser.hardwareConcurrency / 2);
+// `web worker`池 容量
 WorkerPool.workerCount = Math.max(Math.min(availableLogicalProcessors, 6), 1);

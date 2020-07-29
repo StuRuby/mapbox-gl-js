@@ -1,23 +1,48 @@
 // @flow
 
-import {Event, ErrorEvent, Evented} from '../util/evented';
+import {
+    Event,
+    ErrorEvent,
+    Evented
+} from '../util/evented';
 
-import {extend, pick} from '../util/util';
+import {
+    extend,
+    pick
+} from '../util/util';
 import loadTileJSON from './load_tilejson';
-import {postTurnstileEvent, postMapLoadEvent} from '../util/mapbox';
+import {
+    postTurnstileEvent,
+    postMapLoadEvent
+} from '../util/mapbox';
 import TileBounds from './tile_bounds';
-import {ResourceType} from '../util/ajax';
+import {
+    ResourceType
+} from '../util/ajax';
 import browser from '../util/browser';
-import {cacheEntryPossiblyAdded} from '../util/tile_request_cache';
+import {
+    cacheEntryPossiblyAdded
+} from '../util/tile_request_cache';
 
-import type {Source} from './source';
-import type {OverscaledTileID} from './tile_id';
+import type {
+    Source
+} from './source';
+import type {
+    OverscaledTileID
+} from './tile_id';
 import type Map from '../ui/map';
 import type Dispatcher from '../util/dispatcher';
 import type Tile from './tile';
-import type {Callback} from '../types/callback';
-import type {Cancelable} from '../types/cancelable';
-import type {VectorSourceSpecification, PromoteIdSpecification} from '../style-spec/types';
+import type {
+    Callback
+} from '../types/callback';
+import type {
+    Cancelable
+} from '../types/cancelable';
+import type {
+    VectorSourceSpecification,
+    PromoteIdSpecification
+} from '../style-spec/types';
 
 /**
  * A source containing vector tiles in [Mapbox Vector Tile format](https://docs.mapbox.com/vector-tiles/reference/).
@@ -53,21 +78,23 @@ class VectorTileSource extends Evented implements Source {
     url: string;
     scheme: string;
     tileSize: number;
-    promoteId: ?PromoteIdSpecification;
+    promoteId: ? PromoteIdSpecification;
 
     _options: VectorSourceSpecification;
     _collectResourceTiming: boolean;
     dispatcher: Dispatcher;
     map: Map;
-    bounds: ?[number, number, number, number];
-    tiles: Array<string>;
+    bounds: ? [number, number, number, number];
+    tiles: Array < string > ;
     tileBounds: TileBounds;
     reparseOverscaled: boolean;
     isTileClipped: boolean;
-    _tileJSONRequest: ?Cancelable;
+    _tileJSONRequest: ? Cancelable;
     _loaded: boolean;
 
-    constructor(id: string, options: VectorSourceSpecification & {collectResourceTiming: boolean}, dispatcher: Dispatcher, eventedParent: Evented) {
+    constructor(id: string, options: VectorSourceSpecification & {
+        collectResourceTiming: boolean
+    }, dispatcher: Dispatcher, eventedParent: Evented) {
         super();
         this.id = id;
         this.dispatcher = dispatcher;
@@ -82,7 +109,9 @@ class VectorTileSource extends Evented implements Source {
         this._loaded = false;
 
         extend(this, pick(options, ['url', 'scheme', 'tileSize', 'promoteId']));
-        this._options = extend({type: 'vector'}, options);
+        this._options = extend({
+            type: 'vector'
+        }, options);
 
         this._collectResourceTiming = options.collectResourceTiming;
 
@@ -95,7 +124,9 @@ class VectorTileSource extends Evented implements Source {
 
     load() {
         this._loaded = false;
-        this.fire(new Event('dataloading', {dataType: 'source'}));
+        this.fire(new Event('dataloading', {
+            dataType: 'source'
+        }));
         this._tileJSONRequest = loadTileJSON(this._options, this.map._requestManager, (err, tileJSON) => {
             this._tileJSONRequest = null;
             this._loaded = true;
@@ -110,8 +141,14 @@ class VectorTileSource extends Evented implements Source {
                 // `content` is included here to prevent a race condition where `Style#_updateSources` is called
                 // before the TileJSON arrives. this makes sure the tiles needed are loaded once TileJSON arrives
                 // ref: https://github.com/mapbox/mapbox-gl-js/pull/4347#discussion_r104418088
-                this.fire(new Event('data', {dataType: 'source', sourceDataType: 'metadata'}));
-                this.fire(new Event('data', {dataType: 'source', sourceDataType: 'content'}));
+                this.fire(new Event('data', {
+                    dataType: 'source',
+                    sourceDataType: 'metadata'
+                }));
+                this.fire(new Event('data', {
+                    dataType: 'source',
+                    sourceDataType: 'content'
+                }));
             }
         });
     }
@@ -147,7 +184,7 @@ class VectorTileSource extends Evented implements Source {
      * @param {string[]} tiles An array of one or more tile source URLs, as in the TileJSON spec.
      * @returns {VectorTileSource} this
      */
-    setTiles(tiles: Array<string>) {
+    setTiles(tiles: Array < string > ) {
         this.setSourceProperty(() => {
             this._options.tiles = tiles;
         });
@@ -181,7 +218,7 @@ class VectorTileSource extends Evented implements Source {
         return extend({}, this._options);
     }
 
-    loadTile(tile: Tile, callback: Callback<void>) {
+    loadTile(tile: Tile, callback: Callback < void > ) {
         const url = this.map._requestManager.normalizeTileURL(tile.tileID.canonical.url(this.tiles, this.scheme));
         const params = {
             request: this.map._requestManager.transformRequest(url, ResourceType.Tile),
@@ -240,14 +277,22 @@ class VectorTileSource extends Evented implements Source {
             delete tile.request;
         }
         if (tile.actor) {
-            tile.actor.send('abortTile', {uid: tile.uid, type: this.type, source: this.id}, undefined);
+            tile.actor.send('abortTile', {
+                uid: tile.uid,
+                type: this.type,
+                source: this.id
+            }, undefined);
         }
     }
 
     unloadTile(tile: Tile) {
         tile.unloadVectorData();
         if (tile.actor) {
-            tile.actor.send('removeTile', {uid: tile.uid, type: this.type, source: this.id}, undefined);
+            tile.actor.send('removeTile', {
+                uid: tile.uid,
+                type: this.type,
+                source: this.id
+            }, undefined);
         }
     }
 

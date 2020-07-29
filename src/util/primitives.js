@@ -1,46 +1,51 @@
 // @flow
 
-import {vec3, vec4} from 'gl-matrix';
+import {
+    vec3,
+    vec4
+} from 'gl-matrix';
 import assert from 'assert';
 
 class Frustum {
-    points: Array<Array<number>>;
-    planes: Array<Array<number>>;
+    points: Array < Array < number >> ;
+    planes: Array < Array < number >> ;
 
-    constructor(points_: Array<Array<number>>, planes_: Array<Array<number>>) {
+    constructor(points_: Array < Array < number >> , planes_: Array < Array < number >> ) {
         this.points = points_;
         this.planes = planes_;
     }
 
     static fromInvProjectionMatrix(invProj: Float64Array, worldSize: number, zoom: number): Frustum {
+        // 归一化的NDC坐标
         const clipSpaceCorners = [
             [-1, 1, -1, 1],
-            [ 1, 1, -1, 1],
-            [ 1, -1, -1, 1],
+            [1, 1, -1, 1],
+            [1, -1, -1, 1],
             [-1, -1, -1, 1],
             [-1, 1, 1, 1],
-            [ 1, 1, 1, 1],
-            [ 1, -1, 1, 1],
+            [1, 1, 1, 1],
+            [1, -1, 1, 1],
             [-1, -1, 1, 1]
         ];
 
         const scale = Math.pow(2, zoom);
 
         // Transform frustum corner points from clip space to tile space
+        // 将视椎体坐标从裁剪空间转换到切片空间
         const frustumCoords = clipSpaceCorners
             .map(v => vec4.transformMat4([], v, invProj))
             .map(v => vec4.scale([], v, 1.0 / v[3] / worldSize * scale));
 
         const frustumPlanePointIndices = [
-            [0, 1, 2],  // near
-            [6, 5, 4],  // far
-            [0, 3, 7],  // left
-            [2, 1, 5],  // right
-            [3, 2, 6],  // bottom
-            [0, 4, 5]   // top
+            [0, 1, 2], // near
+            [6, 5, 4], // far
+            [0, 3, 7], // left
+            [2, 1, 5], // right
+            [3, 2, 6], // bottom
+            [0, 4, 5] // top
         ];
 
-        const frustumPlanes = frustumPlanePointIndices.map((p: Array<number>) => {
+        const frustumPlanes = frustumPlanePointIndices.map((p: Array < number > ) => {
             const a = vec3.sub([], frustumCoords[p[0]], frustumCoords[p[1]]);
             const b = vec3.sub([], frustumCoords[p[2]], frustumCoords[p[1]]);
             const n = vec3.normalize([], vec3.cross([], a, b));
@@ -76,12 +81,12 @@ class Aabb {
         return new Aabb(qMin, qMax);
     }
 
-    distanceX(point: Array<number>): number {
+    distanceX(point: Array < number > ): number {
         const pointOnAabb = Math.max(Math.min(this.max[0], point[0]), this.min[0]);
         return pointOnAabb - point[0];
     }
 
-    distanceY(point: Array<number>): number {
+    distanceY(point: Array < number > ): number {
         const pointOnAabb = Math.max(Math.min(this.max[1], point[1]), this.min[1]);
         return pointOnAabb - point[1];
     }

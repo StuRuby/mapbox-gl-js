@@ -1,7 +1,11 @@
 // @flow
 
-import LngLat, {earthRadius} from '../geo/lng_lat';
-import type {LngLatLike} from '../geo/lng_lat';
+import LngLat, {
+    earthRadius
+} from '../geo/lng_lat';
+import type {
+    LngLatLike
+} from '../geo/lng_lat';
 
 /*
  * The average circumference of the world in meters.
@@ -101,9 +105,9 @@ class MercatorCoordinate {
         const lngLat = LngLat.convert(lngLatLike);
 
         return new MercatorCoordinate(
-                mercatorXfromLng(lngLat.lng),
-                mercatorYfromLat(lngLat.lat),
-                mercatorZfromAltitude(altitude, lngLat.lat));
+            mercatorXfromLng(lngLat.lng),
+            mercatorYfromLat(lngLat.lat),
+            mercatorZfromAltitude(altitude, lngLat.lat));
     }
 
     /**
@@ -116,8 +120,8 @@ class MercatorCoordinate {
      */
     toLngLat() {
         return new LngLat(
-                lngFromMercatorX(this.x),
-                latFromMercatorY(this.y));
+            lngFromMercatorX(this.x),
+            latFromMercatorY(this.y));
     }
 
     /**

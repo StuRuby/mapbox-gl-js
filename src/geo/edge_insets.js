@@ -1,7 +1,11 @@
 // @flow
-import {number} from "../style-spec/util/interpolate";
-import Point  from "@mapbox/point-geometry";
-import {clamp} from "../util/util";
+import {
+    number
+} from "../style-spec/util/interpolate";
+import Point from "@mapbox/point-geometry";
+import {
+    clamp
+} from "../util/util";
 
 /**
  * An `EdgeInset` object represents screen space padding applied to the edges of the viewport.
@@ -97,6 +101,11 @@ class EdgeInsets {
     }
 }
 
-export type PaddingOptions = {top: ?number, bottom: ?number, right: ?number, left: ?number};
+export type PaddingOptions = {
+    top: ? number,
+    bottom: ? number,
+    right: ? number,
+    left: ? number
+};
 
 export default EdgeInsets;

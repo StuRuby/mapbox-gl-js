@@ -3,7 +3,9 @@
 import assert from 'assert';
 import supported from '@mapbox/mapbox-gl-supported';
 
-import {version} from '../package.json';
+import {
+    version
+} from '../package.json';
 import Map from './ui/map';
 import NavigationControl from './ui/control/navigation_control';
 import GeolocateControl from './ui/control/geolocate_control';
@@ -17,15 +19,31 @@ import LngLat from './geo/lng_lat';
 import LngLatBounds from './geo/lng_lat_bounds';
 import Point from '@mapbox/point-geometry';
 import MercatorCoordinate from './geo/mercator_coordinate';
-import {Evented} from './util/evented';
+import {
+    Evented
+} from './util/evented';
 import config from './util/config';
-import {Debug} from './util/debug';
-import {isSafari} from './util/util';
-import {setRTLTextPlugin, getRTLTextPluginStatus} from './source/rtl_text_plugin';
+import {
+    Debug
+} from './util/debug';
+import {
+    isSafari
+} from './util/util';
+import {
+    setRTLTextPlugin,
+    getRTLTextPluginStatus
+} from './source/rtl_text_plugin';
 import WorkerPool from './util/worker_pool';
-import {prewarm, clearPrewarmedResources} from './util/global_worker_pool';
-import {clearTileCache} from './util/tile_request_cache';
-import {PerformanceUtils} from './util/performance';
+import {
+    prewarm,
+    clearPrewarmedResources
+} from './util/global_worker_pool';
+import {
+    clearTileCache
+} from './util/tile_request_cache';
+import {
+    PerformanceUtils
+} from './util/performance';
 
 const exported = {
     version,
@@ -90,7 +108,7 @@ const exported = {
      * mapboxgl.accessToken = myAccessToken;
      * @see [Display a map](https://www.mapbox.com/mapbox-gl-js/examples/)
      */
-    get accessToken(): ?string {
+    get accessToken(): ? string {
         return config.ACCESS_TOKEN;
     },
 
@@ -106,7 +124,7 @@ const exported = {
      * @example
      * mapboxgl.baseApiUrl = 'https://api.mapbox.com';
      */
-    get baseApiUrl(): ?string {
+    get baseApiUrl(): ? string {
         return config.API_URL;
     },
 
@@ -166,7 +184,7 @@ const exported = {
      * @example
      * mapboxgl.clearStorage();
      */
-    clearStorage(callback?: (err: ?Error) => void) {
+    clearStorage(callback ? : (err: ? Error) => void) {
         clearTileCache(callback);
     },
 
@@ -174,7 +192,10 @@ const exported = {
 };
 
 //This gets automatically stripped out in production builds.
-Debug.extend(exported, {isSafari, getPerformanceMetrics: PerformanceUtils.getPerformanceMetrics});
+Debug.extend(exported, {
+    isSafari,
+    getPerformanceMetrics: PerformanceUtils.getPerformanceMetrics
+});
 
 /**
  * The version of Mapbox GL JS in use as specified in `package.json`,
@@ -212,14 +233,14 @@ Debug.extend(exported, {isSafari, getPerformanceMetrics: PerformanceUtils.getPer
  */
 
 /**
-  * Gets the map's [RTL text plugin](https://www.mapbox.com/mapbox-gl-js/plugins/#mapbox-gl-rtl-text) status.
-  * The status can be `unavailable` (i.e. not requested or removed), `loading`, `loaded` or `error`.
-  * If the status is `loaded` and the plugin is requested again, an error will be thrown.
-  *
-  * @function getRTLTextPluginStatus
-  * @example
-  * const pluginStatus = mapboxgl.getRTLTextPluginStatus();
-  */
+ * Gets the map's [RTL text plugin](https://www.mapbox.com/mapbox-gl-js/plugins/#mapbox-gl-rtl-text) status.
+ * The status can be `unavailable` (i.e. not requested or removed), `loading`, `loaded` or `error`.
+ * If the status is `loaded` and the plugin is requested again, an error will be thrown.
+ *
+ * @function getRTLTextPluginStatus
+ * @example
+ * const pluginStatus = mapboxgl.getRTLTextPluginStatus();
+ */
 
 export default exported;
 

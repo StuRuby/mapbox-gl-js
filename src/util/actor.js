@@ -1,12 +1,23 @@
 // @flow
 
-import {bindAll, isWorker, isSafari} from './util';
+import {
+    bindAll,
+    isWorker,
+    isSafari
+} from './util';
 import window from './window';
-import {serialize, deserialize} from './web_worker_transfer';
+import {
+    serialize,
+    deserialize
+} from './web_worker_transfer';
 import ThrottledInvoker from './throttled_invoker';
 
-import type {Transferable} from '../types/transferable';
-import type {Cancelable} from '../types/cancelable';
+import type {
+    Transferable
+} from '../types/transferable';
+import type {
+    Cancelable
+} from '../types/cancelable';
 
 /**
  * An implementation of the [Actor design pattern](http://en.wikipedia.org/wiki/Actor_model)
@@ -22,16 +33,22 @@ import type {Cancelable} from '../types/cancelable';
 class Actor {
     target: any;
     parent: any;
-    mapId: ?number;
-    callbacks: { number: any };
+    mapId: ? number;
+    callbacks: {
+        number: any
+    };
     name: string;
-    tasks: { number: any };
-    taskQueue: Array<number>;
-    cancelCallbacks: { number: Cancelable };
+    tasks: {
+        number: any
+    };
+    taskQueue: Array < number > ;
+    cancelCallbacks: {
+        number: Cancelable
+    };
     invoker: ThrottledInvoker;
     globalScope: any;
 
-    constructor(target: any, parent: any, mapId: ?number) {
+    constructor(target: any, parent: any, mapId: ? number) {
         this.target = target;
         this.parent = parent;
         this.mapId = mapId;
@@ -53,7 +70,7 @@ class Actor {
      * @param targetMapId A particular mapId to which to send this message.
      * @private
      */
-    send(type: string, data: mixed, callback: ?Function, targetMapId: ?string, mustQueue: boolean = false): ?Cancelable {
+    send(type: string, data: mixed, callback: ? Function, targetMapId : ? string, mustQueue : boolean = false): ? Cancelable {
         // We're using a string ID instead of numbers because they are being used as object keys
         // anyway, and thus stringified implicitly. We use random IDs because an actor may receive
         // message from multiple other actors which could run in different execution context. A
@@ -62,7 +79,7 @@ class Actor {
         if (callback) {
             this.callbacks[id] = callback;
         }
-        const buffers: ?Array<Transferable> = isSafari(this.globalScope) ? undefined : [];
+        const buffers: ? Array < Transferable > = isSafari(this.globalScope) ? undefined : [];
         this.target.postMessage({
             id,
             type,
@@ -95,7 +112,7 @@ class Actor {
         if (!id) {
             return;
         }
-
+        // 非当前地图实例发送的消息，不予处理
         if (data.targetMapId && this.mapId !== data.targetMapId) {
             return;
         }
@@ -166,7 +183,7 @@ class Actor {
             }
         } else {
             let completed = false;
-            const buffers: ?Array<Transferable> = isSafari(this.globalScope) ? undefined : [];
+            const buffers: ? Array < Transferable > = isSafari(this.globalScope) ? undefined : [];
             const done = task.hasCallback ? (err, data) => {
                 completed = true;
                 delete this.cancelCallbacks[id];

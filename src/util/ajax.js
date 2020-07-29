@@ -1,16 +1,30 @@
 // @flow
 
 import window from './window';
-import {extend, warnOnce, isWorker} from './util';
-import {isMapboxHTTPURL, hasCacheDefeatingSku} from './mapbox';
+import {
+    extend,
+    warnOnce,
+    isWorker
+} from './util';
+import {
+    isMapboxHTTPURL,
+    hasCacheDefeatingSku
+} from './mapbox';
 import config from './config';
 import assert from 'assert';
-import {cacheGet, cachePut} from './tile_request_cache';
+import {
+    cacheGet,
+    cachePut
+} from './tile_request_cache';
 import webpSupported from './webp_supported';
 import offscreenCanvasSupported from './offscreen_canvas_supported';
 
-import type {Callback} from '../types/callback';
-import type {Cancelable} from '../types/cancelable';
+import type {
+    Callback
+} from '../types/callback';
+import type {
+    Cancelable
+} from '../types/cancelable';
 
 /**
  * The type of a resource.
@@ -28,7 +42,9 @@ const ResourceType = {
     SpriteJSON: 'SpriteJSON',
     Image: 'Image'
 };
-export {ResourceType};
+export {
+    ResourceType
+};
 
 if (typeof Object.freeze == 'function') {
     Object.freeze(ResourceType);
@@ -59,15 +75,15 @@ if (typeof Object.freeze == 'function') {
  */
 export type RequestParameters = {
     url: string,
-    headers?: Object,
-    method?: 'GET' | 'POST' | 'PUT',
-    body?: string,
-    type?: 'string' | 'json' | 'arrayBuffer',
-    credentials?: 'same-origin' | 'include',
-    collectResourceTiming?: boolean
+    headers ? : Object,
+    method ? : 'GET' | 'POST' | 'PUT',
+    body ? : string,
+    type ? : 'string' | 'json' | 'arrayBuffer',
+    credentials ? : 'same-origin' | 'include',
+    collectResourceTiming ? : boolean
 };
 
-export type ResponseCallback<T> = (error: ?Error, data: ?T, cacheControl: ?string, expires: ?string) => void;
+export type ResponseCallback < T > = (error: ? Error, data : ? T, cacheControl : ? string, expires : ? string) => void;
 
 class AJAXError extends Error {
     status: number;
@@ -104,7 +120,7 @@ export const getReferrer = isWorker() ?
 // via a file:// URL.
 const isFileURL = url => /^file:/.test(url) || (/^file:/.test(getReferrer()) && !/^\w+:/.test(url));
 
-function makeFetchRequest(requestParameters: RequestParameters, callback: ResponseCallback<any>): Cancelable {
+function makeFetchRequest(requestParameters: RequestParameters, callback: ResponseCallback < any > ): Cancelable {
     const controller = new window.AbortController();
     const request = new window.Request(requestParameters.url, {
         method: requestParameters.method || 'GET',
@@ -190,13 +206,15 @@ function makeFetchRequest(requestParameters: RequestParameters, callback: Respon
         validateOrFetch(null, null);
     }
 
-    return {cancel: () => {
-        aborted = true;
-        if (!complete) controller.abort();
-    }};
+    return {
+        cancel: () => {
+            aborted = true;
+            if (!complete) controller.abort();
+        }
+    };
 }
 
-function makeXMLHttpRequest(requestParameters: RequestParameters, callback: ResponseCallback<any>): Cancelable {
+function makeXMLHttpRequest(requestParameters: RequestParameters, callback: ResponseCallback < any > ): Cancelable {
     const xhr: XMLHttpRequest = new window.XMLHttpRequest();
 
     xhr.open(requestParameters.method || 'GET', requestParameters.url, true);
@@ -231,10 +249,12 @@ function makeXMLHttpRequest(requestParameters: RequestParameters, callback: Resp
         }
     };
     xhr.send(requestParameters.body);
-    return {cancel: () => xhr.abort()};
+    return {
+        cancel: () => xhr.abort()
+    };
 }
 
-export const makeRequest = function(requestParameters: RequestParameters, callback: ResponseCallback<any>): Cancelable {
+export const makeRequest = function (requestParameters: RequestParameters, callback: ResponseCallback < any > ): Cancelable {
     // We're trying to use the Fetch API if possible. However, in some situations we can't use it:
     // - IE11 doesn't support it at all. In this case, we dispatch the request to the main thread so
     //   that we can get an accruate referrer header.
@@ -254,16 +274,22 @@ export const makeRequest = function(requestParameters: RequestParameters, callba
     return makeXMLHttpRequest(requestParameters, callback);
 };
 
-export const getJSON = function(requestParameters: RequestParameters, callback: ResponseCallback<Object>): Cancelable {
-    return makeRequest(extend(requestParameters, {type: 'json'}), callback);
+export const getJSON = function (requestParameters: RequestParameters, callback: ResponseCallback < Object > ): Cancelable {
+    return makeRequest(extend(requestParameters, {
+        type: 'json'
+    }), callback);
 };
 
-export const getArrayBuffer = function(requestParameters: RequestParameters, callback: ResponseCallback<ArrayBuffer>): Cancelable {
-    return makeRequest(extend(requestParameters, {type: 'arrayBuffer'}), callback);
+export const getArrayBuffer = function (requestParameters: RequestParameters, callback: ResponseCallback < ArrayBuffer > ): Cancelable {
+    return makeRequest(extend(requestParameters, {
+        type: 'arrayBuffer'
+    }), callback);
 };
 
-export const postData = function(requestParameters: RequestParameters, callback: ResponseCallback<string>): Cancelable {
-    return makeRequest(extend(requestParameters, {method: 'POST'}), callback);
+export const postData = function (requestParameters: RequestParameters, callback: ResponseCallback < string > ): Cancelable {
+    return makeRequest(extend(requestParameters, {
+        method: 'POST'
+    }), callback);
 };
 
 function sameOrigin(url) {
@@ -274,7 +300,7 @@ function sameOrigin(url) {
 
 const transparentPngUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQYV2NgAAIAAAUAAarVyFEAAAAASUVORK5CYII=';
 
-function arrayBufferToImage(data: ArrayBuffer, callback: (err: ?Error, image: ?HTMLImageElement) => void, cacheControl: ?string, expires: ?string) {
+function arrayBufferToImage(data: ArrayBuffer, callback: (err: ? Error, image : ? HTMLImageElement) => void, cacheControl: ? string, expires : ? string) {
     const img: HTMLImageElement = new window.Image();
     const URL = window.URL;
     img.onload = () => {
@@ -282,14 +308,18 @@ function arrayBufferToImage(data: ArrayBuffer, callback: (err: ?Error, image: ?H
         URL.revokeObjectURL(img.src);
     };
     img.onerror = () => callback(new Error('Could not load image. Please make sure to use a supported image type such as PNG or JPEG. Note that SVGs are not supported.'));
-    const blob: Blob = new window.Blob([new Uint8Array(data)], {type: 'image/png'});
+    const blob: Blob = new window.Blob([new Uint8Array(data)], {
+        type: 'image/png'
+    });
     (img: any).cacheControl = cacheControl;
     (img: any).expires = expires;
     img.src = data.byteLength ? URL.createObjectURL(blob) : transparentPngUrl;
 }
 
-function arrayBufferToImageBitmap(data: ArrayBuffer, callback: (err: ?Error, image: ?ImageBitmap) => void) {
-    const blob: Blob = new window.Blob([new Uint8Array(data)], {type: 'image/png'});
+function arrayBufferToImageBitmap(data: ArrayBuffer, callback: (err: ? Error, image : ? ImageBitmap) => void) {
+    const blob: Blob = new window.Blob([new Uint8Array(data)], {
+        type: 'image/png'
+    });
     window.createImageBitmap(blob).then((imgBitmap) => {
         callback(null, imgBitmap);
     }).catch((e) => {
@@ -304,7 +334,7 @@ export const resetImageRequestQueue = () => {
 };
 resetImageRequestQueue();
 
-export const getImage = function(requestParameters: RequestParameters, callback: Callback<HTMLImageElement | ImageBitmap>): Cancelable {
+export const getImage = function (requestParameters: RequestParameters, callback: Callback < HTMLImageElement | ImageBitmap > ): Cancelable {
     if (webpSupported.supported) {
         if (!requestParameters.headers) {
             requestParameters.headers = {};
@@ -318,7 +348,9 @@ export const getImage = function(requestParameters: RequestParameters, callback:
             requestParameters,
             callback,
             cancelled: false,
-            cancel() { this.cancelled = true; }
+            cancel() {
+                this.cancelled = true;
+            }
         };
         imageQueue.push(queued);
         return queued;
@@ -333,7 +365,11 @@ export const getImage = function(requestParameters: RequestParameters, callback:
         assert(numImageRequests >= 0);
         while (imageQueue.length && numImageRequests < config.MAX_PARALLEL_IMAGE_REQUESTS) { // eslint-disable-line
             const request = imageQueue.shift();
-            const {requestParameters, callback, cancelled} = request;
+            const {
+                requestParameters,
+                callback,
+                cancelled
+            } = request;
             if (!cancelled) {
                 request.cancel = getImage(requestParameters, callback).cancel;
             }
@@ -342,7 +378,7 @@ export const getImage = function(requestParameters: RequestParameters, callback:
 
     // request the image with XHR to work around caching issues
     // see https://github.com/mapbox/mapbox-gl-js/issues/1470
-    const request = getArrayBuffer(requestParameters, (err: ?Error, data: ?ArrayBuffer, cacheControl: ?string, expires: ?string) => {
+    const request = getArrayBuffer(requestParameters, (err: ? Error, data : ? ArrayBuffer, cacheControl : ? string, expires : ? string) => {
 
         advanceImageRequestQueue();
 
@@ -365,10 +401,10 @@ export const getImage = function(requestParameters: RequestParameters, callback:
     };
 };
 
-export const getVideo = function(urls: Array<string>, callback: Callback<HTMLVideoElement>): Cancelable {
+export const getVideo = function (urls: Array < string > , callback: Callback < HTMLVideoElement > ): Cancelable {
     const video: HTMLVideoElement = window.document.createElement('video');
     video.muted = true;
-    video.onloadstart = function() {
+    video.onloadstart = function () {
         callback(null, video);
     };
     for (let i = 0; i < urls.length; i++) {
@@ -379,5 +415,7 @@ export const getVideo = function(urls: Array<string>, callback: Callback<HTMLVid
         s.src = urls[i];
         video.appendChild(s);
     }
-    return {cancel: () => {}};
+    return {
+        cancel: () => {}
+    };
 };
