@@ -19,6 +19,7 @@ import LngLat from './geo/lng_lat';
 import LngLatBounds from './geo/lng_lat_bounds';
 import Point from '@mapbox/point-geometry';
 import MercatorCoordinate from './geo/mercator_coordinate';
+import CustomTileLayer from './extends/custom_tile_layer';
 import {
     Evented
 } from './util/evented';
@@ -63,6 +64,7 @@ const exported = {
     LngLatBounds,
     Point,
     MercatorCoordinate,
+    CustomTileLayer,
     Evented,
     config,
     /**

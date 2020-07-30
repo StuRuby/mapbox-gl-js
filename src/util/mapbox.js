@@ -53,12 +53,10 @@ type ResourceTypeEnum = $Keys < typeof ResourceType > ;
 export type RequestTransformFunction = (url: string, resourceType ? : ResourceTypeEnum) => RequestParameters;
 
 type UrlObject = {
-    |
     protocol: string,
     authority: string,
     path: string,
     params: Array < string >
-        |
 };
 
 export class RequestManager {
