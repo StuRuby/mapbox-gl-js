@@ -6,8 +6,10 @@ import type MapboxglMap from '../ui/map';
 import Map from 'ol/Map';
 import View from 'ol/View';
 import WMTSTileGrid from 'ol/tilegrid/WMTS';
+import TileGrid from 'ol/tilegrid/TileGrid';
 import WMTSSource from 'ol/source/WMTS';
 import XYZSource from 'ol/source/XYZ';
+import TileImageSource from 'ol/source/TileImage';
 import TileLayer from 'ol/layer/Tile';
 import {
     transform,
@@ -73,6 +75,11 @@ export default class CustomTileLayer {
                 source = new XYZSource(Object.assign(this.tileOptions, {
                     tileGrid
                 }));
+            case 'TILE_IMAGE':
+                tileGrid = new TileGrid(this.tileOptions.tileGrid);
+                source = new TileImageSource(Object.assign(this.tileOptions, {
+                    tileGrid
+                }));
                 break;
             default:
                 throw new Error('暂不支持此类型服务的添加，请选择WMTS或XYZ');
@@ -80,7 +87,7 @@ export default class CustomTileLayer {
         const tileLayer = new TileLayer({
             source
         });
-        tileLayer.on('prerender', function () {
+        tileLayer.on('postrender', function () {
             self.map.triggerRepaint();
         });
         map.addLayer(tileLayer);
@@ -271,7 +278,7 @@ interface Options {
 }
 
 
-type LayerType = 'WMTS' | 'XYZ';
+type LayerType = 'WMTS' | 'XYZ' | 'TILE_IMAGE';
 
 type WMTSTileGridInterface = {
     origin: [number, number];
