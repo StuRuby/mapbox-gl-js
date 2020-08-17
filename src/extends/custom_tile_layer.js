@@ -14,7 +14,8 @@ import TileLayer from 'ol/layer/Tile';
 import {
     transform,
     transformExtent
-} from 'ol/proj'
+} from 'ol/proj';
+
 
 import type {
     CustomLayerInterface
@@ -24,6 +25,7 @@ export default class CustomTileLayer {
     width: number;
     height: number;
     tileOptions: TileOptions;
+    setTileLoadFunction: Function;
     id: string;
     olMap: Map;
     layer: CustomLayerInterface;
@@ -33,12 +35,14 @@ export default class CustomTileLayer {
             id,
             width,
             height,
-            tileOptions
+            tileOptions,
+            setTileLoadFunction
         } = options;
         this.id = id;
         this.width = width;
         this.height = height;
         this.tileOptions = tileOptions;
+        this.setTileLoadFunction = setTileLoadFunction;
 
         this.olMap = this.createOlMap(type);
         this.layer = this.createCustomWMTSLayer();
@@ -52,7 +56,7 @@ export default class CustomTileLayer {
         const map = new Map({
             target: container,
             view: new View({
-                projection: 'EPSG:3857',
+                projection: 'EPSG:4326',
                 center: [0, 0],
                 zoom: 10,
             })
@@ -83,6 +87,9 @@ export default class CustomTileLayer {
                 break;
             default:
                 throw new Error('暂不支持此类型服务的添加，请选择WMTS或XYZ');
+        }
+        if (this.setTileLoadFunction) {
+            source.setTileLoadFunction(this.setTileLoadFunction);
         }
         const tileLayer = new TileLayer({
             source
@@ -243,13 +250,14 @@ export default class CustomTileLayer {
         const olMap = this.olMap;
         const size = [this.width, this.height];
         const extent = olMap.getView().calculateExtent(size);
-        return transformExtent(extent, 'EPSG:3857', 'EPSG:4326');
+        // return transformExtent(extent, 'EPSG:3857', 'EPSG:4326');
+        return extent;
     }
 
     updatePosition() {
         const center = this.map.getCenter().toArray();
         const centerIn3857 = transform(center, 'EPSG:4326', 'EPSG:3857');
-        this.olMap.getView().setCenter(centerIn3857);
+        this.olMap.getView().setCenter(center);
         this.olMap.getView().setZoom(this.map.getZoom() + 1);
     }
 
@@ -275,6 +283,7 @@ interface Options {
     width: number;
     height: number;
     tileOptions: TileOptions;
+    setTileLoadFunction: Function;
 }
 
 
