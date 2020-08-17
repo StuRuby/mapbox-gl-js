@@ -56,7 +56,7 @@ export default class CustomTileLayer {
         const map = new Map({
             target: container,
             view: new View({
-                projection: 'EPSG:4326',
+                projection: 'EPSG:3857',
                 center: [0, 0],
                 zoom: 10,
             })
@@ -250,14 +250,13 @@ export default class CustomTileLayer {
         const olMap = this.olMap;
         const size = [this.width, this.height];
         const extent = olMap.getView().calculateExtent(size);
-        // return transformExtent(extent, 'EPSG:3857', 'EPSG:4326');
-        return extent;
+        return transformExtent(extent, 'EPSG:3857', 'EPSG:4326');
     }
 
     updatePosition() {
         const center = this.map.getCenter().toArray();
         const centerIn3857 = transform(center, 'EPSG:4326', 'EPSG:3857');
-        this.olMap.getView().setCenter(center);
+        this.olMap.getView().setCenter(centerIn3857);
         this.olMap.getView().setZoom(this.map.getZoom() + 1);
     }
 
