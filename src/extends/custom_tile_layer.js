@@ -80,10 +80,7 @@ export default class CustomTileLayer {
                     tileGrid
                 }));
             case 'TILE_IMAGE':
-                tileGrid = new TileGrid(this.tileOptions.tileGrid);
-                source = new TileImageSource(Object.assign(this.tileOptions, {
-                    tileGrid
-                }));
+                source = new TileImageSource(this.tileOptions);
                 break;
             default:
                 throw new Error('暂不支持此类型服务的添加，请选择WMTS或XYZ');
