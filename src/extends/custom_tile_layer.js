@@ -12,6 +12,9 @@ import XYZSource from 'ol/source/XYZ';
 import TileImageSource from 'ol/source/TileImage';
 import TileLayer from 'ol/layer/Tile';
 import {
+    uuid
+} from '../util/util';
+import {
     transform,
     transformExtent
 } from 'ol/proj';
@@ -21,6 +24,10 @@ import type {
     CustomLayerInterface
 } from '../style/style_layer/custom_style_layer';
 
+/**
+ * @type WMTS、XYZ、TILE_IMAGE
+ * @options 特殊属性: tileOptions
+ */
 export default class CustomTileLayer {
     width: number;
     height: number;
@@ -32,15 +39,12 @@ export default class CustomTileLayer {
     map: MapboxglMap;
     constructor(type: LayerType, options: Options) {
         const {
-            id,
-            width,
-            height,
             tileOptions,
             setTileLoadFunction
         } = options;
-        this.id = id;
-        this.width = width;
-        this.height = height;
+        this.id = uuid();
+        this.width = window.innerWidth;
+        this.height = window.innerHeight;
         this.tileOptions = tileOptions;
         this.setTileLoadFunction = setTileLoadFunction;
 
@@ -104,7 +108,7 @@ export default class CustomTileLayer {
         const olMap = this.olMap;
 
         const customWMTSLayer: any = {
-            id: this.id || 'customWMTSLayer',
+            id: this.id,
             type: 'custom',
             onAdd: function (map: Map, gl: WebGLRenderingContext) {
                 const vertexShaderSource = `
