@@ -1,6 +1,9 @@
 // @flow
 
-import {warnOnce, parseCacheControl} from './util';
+import {
+    warnOnce,
+    parseCacheControl
+} from './util';
 import window from './window';
 
 import type Dispatcher from './dispatcher';
@@ -20,7 +23,7 @@ export type ResponseOptions = {
 // We're using a global shared cache object. Normally, requesting ad-hoc Cache objects is fine, but
 // Safari has a memory leak in which it fails to release memory when requesting keys() from a Cache
 // object. See https://bugs.webkit.org/show_bug.cgi?id=203991 for more information.
-let sharedCache: ?Promise<Cache>;
+let sharedCache: ? Promise < Cache > ;
 
 function cacheOpen() {
     if (window.caches && !sharedCache) {
@@ -35,6 +38,7 @@ export function cacheClose() {
 }
 
 let responseConstructorSupportsReadableStream;
+
 function prepareBody(response: Response, callback) {
     if (responseConstructorSupportsReadableStream === undefined) {
         try {
@@ -91,7 +95,7 @@ function stripQueryParameters(url: string) {
     return start < 0 ? url : url.slice(0, start);
 }
 
-export function cacheGet(request: Request, callback: (error: ?any, response: ?Response, fresh: ?boolean) => void) {
+export function cacheGet(request: Request, callback: (error: ? any, response : ? Response, fresh : ? boolean) => void) {
     cacheOpen();
     if (!sharedCache) return callback(null);
 
@@ -159,7 +163,7 @@ export function enforceCacheSizeLimit(limit: number) {
         });
 }
 
-export function clearTileCache(callback?: (err: ?Error) => void) {
+export function clearTileCache(callback ? : (err: ? Error) => void) {
     const promise = window.caches.delete(CACHE_NAME);
     if (callback) {
         promise.catch(callback).then(() => callback());

@@ -1,3 +1,5 @@
 // @flow strict
 
-export type Cancelable = { cancel: () => void };
+export type Cancelable = {
+    cancel: () => void
+};

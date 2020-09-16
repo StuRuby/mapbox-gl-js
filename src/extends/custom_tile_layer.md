@@ -17,7 +17,7 @@ options 其余参数参考`ol/source/WMTS`.
 
 参考示例：
 ```
-const options = {
+const tileOptions = {
         crossOrigin: 'anonymous',
         projection: 'EPSG:4326',
         url: 'https://arcgis.sdi.abudhabi.ae/arcgis/rest/services/Pub/BaseMapAra_DarkGray_GCS/MapServer/WMTS?',
@@ -32,6 +32,9 @@ const options = {
             matrixIds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
         }
 }
+const options = {
+    tileOptions
+};
 ```
 
 ### 2. type === 'XYZ'
@@ -43,7 +46,7 @@ options 其余参数参考`ol/source/XYZ`.
 
 参考示例：
 ```
-const options = {
+const tileOptions = {
         crossOrigin: 'anonymous',
         projection: 'EPSG:4326',
         url: 'https://arcgis.sdi.abudhabi.ae/arcgis/rest/services/Pub/BaseMapAra_DarkGray_GCS/MapServer/WMTS?',
@@ -53,6 +56,9 @@ const options = {
             matrixIds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
         }
 }
+const options = {
+    tileOptions
+};
 ```
 
 ### 3. type === 'TILE_IMAGE'
@@ -62,7 +68,7 @@ options 参考 `ol/source/TileImage`
 参考示例
 
 ```
-const options = {
+const tileOptions = {
         type: 'TILE_IMAGE',
         // 切片url地址
         url: "https://10.18.17.196/cloudapi/service/api/egis/base/v1/wmts?",
@@ -109,6 +115,10 @@ const options = {
                 z + "&TileCol=" + x + "&TileRow=" + y;
         }
     };
+
+const options = {
+    tileOptions
+};
 ```
 
 
@@ -123,7 +133,7 @@ const options = {
 
 
 ```
-const options = {
+const tileOptions = {
      setTileLoadFunction: function (tile, src) {
                 var xhr = new XMLHttpRequest();
                 xhr.responseType = 'blob';
@@ -141,4 +151,10 @@ const options = {
                 xhr.send();
             }
 }
+```
+
+## 四、添加到地图
+
+```
+customLayer.addToMap(map);
 ```

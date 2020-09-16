@@ -1,6 +1,10 @@
 // @flow
 
-import {MapMouseEvent, MapTouchEvent, MapWheelEvent} from '../events';
+import {
+    MapMouseEvent,
+    MapTouchEvent,
+    MapWheelEvent
+} from '../events';
 import type Map from '../map';
 
 export class MapEventHandler {
@@ -9,7 +13,9 @@ export class MapEventHandler {
     _clickTolerance: number;
     _map: Map;
 
-    constructor(map: Map, options: { clickTolerance: number }) {
+    constructor(map: Map, options: {
+        clickTolerance: number
+    }) {
         this._map = map;
         this._clickTolerance = options.clickTolerance;
     }

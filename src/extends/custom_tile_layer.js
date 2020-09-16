@@ -79,10 +79,15 @@ export default class CustomTileLayer {
                 }));
                 break;
             case 'XYZ':
-                tileGrid = new WMTSTileGrid(this.tileOptions.tileGrid);
-                source = new XYZSource(Object.assign(this.tileOptions, {
-                    tileGrid
-                }));
+                if (tileGrid) {
+                    tileGrid = new WMTSTileGrid(this.tileOptions.tileGrid);
+                    source = new XYZSource(Object.assign(this.tileOptions, {
+                        tileGrid
+                    }));
+                } else {
+                    source = new XYZSource(Object.assign(this.tileOptions));
+                }
+                break;
             case 'TILE_IMAGE':
                 source = new TileImageSource(this.tileOptions);
                 break;
