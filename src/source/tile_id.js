@@ -36,14 +36,19 @@ export class CanonicalTileID {
     url(urls: Array < string > , scheme: ? string) {
         const bbox = getTileBBox(this.x, this.y, this.z);
         const quadkey = getQuadkey(this.z, this.x, this.y);
-
+        const n = scheme === 'tms' ? (Math.pow(2, this.z) - this.y - 1) : this.y;
         return urls[(this.x + this.y) % urls.length]
             .replace('{prefix}', (this.x % 16).toString(16) + (this.y % 16).toString(16))
             .replace('{z}', String(this.z))
             .replace('{x}', String(this.x))
-            .replace('{y}', String(scheme === 'tms' ? (Math.pow(2, this.z) - this.y - 1) : this.y))
+            .replace('{y}', String(n))
+            .replace(/{x\/512}/g, String(Math.floor(this.x / 512)))
+            .replace(/{y\/512}/g, String(Math.floor(this.y / 512)))
+            .replace("{m}", Math.floor(this.x / 16))
+            .replace("{n}", Math.floor(n))
             .replace('{quadkey}', quadkey)
             .replace('{bbox-epsg-3857}', bbox);
+
     }
 
     getTilePoint(coord: MercatorCoordinate) {
